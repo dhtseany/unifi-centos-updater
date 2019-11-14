@@ -14,11 +14,14 @@ MONTH=$(date +"%m")
 YEAR=$(date +"%y")
 
 # Misc Variables
-BACKUP_DIR=/opt/UniFi/data
-BACKUP_FILE=/root/backup$YEAR$MONTH$DOW.tar.gz
+UnifiDataDir=/opt/UniFi/data
+BackupDir=/UnifiBackup
+BackupFile=$BackupDir/backup$YEAR$MONTH$DOW.tar.gz
+TmpDir=/tmp/unifi-updater
 
 # PKG_VER=5.10.25
-PKG_VER=5.11.39
+# PKG_VER=5.11.39
+PKG_VER=5.12.22
 
 runCommand=$1
 
@@ -47,13 +50,25 @@ exit 0
 #		# exit 0
 #fi
 
-TMP_DIR=/tmp/unifi-updater
 
-# Create tmp_dir
-mkdir -p /tmp/unifi-updater
+# Create TmpDir
+#mkdir -p /tmp/unifi-updater
+if [ -d $TmpDir ];
+	then
+		mkdir $TmpDir
+	else
+		echo "[Info] $TmpDir already exists."
+fi
+
+if [ -d $BackupDir ];
+	then
+		mkdir $BackupDir
+	else
+		echo "[Info] $BackupDir already exists."
+fi
 
 # Check if existing backup file exists
-if [ -e $BACKUP_FILE ]; 
+if [ -e $BackupFile ]; 
     then
         echo "You have chosen to launch the installer but I've detected an existing backup."
         read -e -p "Shall I remove the existing backup file? [N/y] : " KILL_BACKUP
@@ -61,11 +76,11 @@ if [ -e $BACKUP_FILE ];
         if [[ ("$KILL_BACKUP" == "y" || "$KILL_BACKUP" == "Y") ]]; 
             then
                 clear
-                rm $BACKUP_FILE
+                rm $BackupFile
             else
                 clear
                 echo "User to chose to keep old backup."
-                mv $BACKUP_FILE $BACKUP_FILE.bak
+                mv $BackupFile $BackupFile.bak
         fi
 
     else
@@ -77,23 +92,23 @@ echo "Stopping the Unifi service..."
 systemctl stop unifi
 
 # take a backup of the data directory
-echo "Creating a tar.gz backup of $BACKUP_DIR to $BACKUP_FILE, please wait..."
+echo "Creating a tar.gz backup of $UnifiDataDir to $BackupFile, please wait..."
 START_DATE=$(date)
 echo "Started at: $START_DATE"
-tar zcf $BACKUP_FILE $BACKUP_DIR
+tar zcf $BackupFile $UnifiDataDir
 END_DATE=$(date)
 echo "Ended at: $END_DATE"
-#tar zcf - /opt/Unifi/data | (pv -p --timer --rate --bytes > $BACKUP_FILE)
+#tar zcf - /opt/Unifi/data | (pv -p --timer --rate --bytes > $BackupFile)
 
 
 
-# cd to tmp_dir and fetch latest installer
-cd $TMP_DIR
+# cd to TmpDir and fetch latest installer
+cd $TmpDir
 
-if [ -f "$TMP_DIR/Unifi.unix.zip" ];
+if [ -f "$TmpDir/Unifi.unix.zip" ];
 	then
-		echo "[Yes] $TMP_DIR/Unifi.unix.zip"
-		rm $TMP_DIR/Unifi.unix.zip
+		echo "[Yes] $TmpDir/Unifi.unix.zip"
+		rm $TmpDir/Unifi.unix.zip
 		read -e -p "Is that file actually gone? " readFileGone
 		if [ "$readFileGone" = "y" ]; 
 	                then
@@ -103,7 +118,7 @@ if [ -f "$TMP_DIR/Unifi.unix.zip" ];
 				exit 1
 		fi
 	else
-            	echo "[No] $TMP_DIR/Unifi.unix.zip"
+            	echo "[No] $TmpDir/Unifi.unix.zip"
                 read -e -p "Is that file actually gone? " readFileGone
                 if [ "$readFileGone" = "y" ];
                         then
@@ -128,9 +143,9 @@ unzip -qo UniFi.unix.zip -d /opt
 # chown -R ubnt:ubnt /opt/UniFi
 
 # Untar the backup into place
-echo "Restoring $BACKUP_FILE to $BACKUP_DIR"
-# tar xzf $BACKUP_FILE -C $BACKUP_DIR
-tar xzf $BACKUP_FILE -C /
+echo "Restoring $BackupFile to $UnifiDataDir"
+# tar xzf $BackupFile -C $UnifiDataDir
+tar xzf $BackupFile -C /
 
 # Take ownership of the unzipped dir
 echo "Taking ownership of the updated Unifi directory"
