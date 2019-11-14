@@ -54,6 +54,7 @@ fi
 #mkdir -p /tmp/unifi-updater
 if [ -d $TmpDir ];
 	then
+		echo "[Info] $TmpDir does not exist. Creating."
 		mkdir $TmpDir
 	else
 		echo "[Info] $TmpDir already exists."
@@ -61,7 +62,7 @@ fi
 
 if [ -d $BackupDir ];
 	then
-		mkdir $BackupDir
+		echo "[Info] $BackupDir does not exist. Creating."
 	else
 		echo "[Info] $BackupDir already exists."
 fi
