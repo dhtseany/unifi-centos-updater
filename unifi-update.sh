@@ -36,7 +36,6 @@ if [[ ("$runCommand" == "repair") ]];
 		systemctl start mongod
 		systemctl start unifi
 fi
-exit 0
 
 #manualURL=$1
 #if [ -z $manualURL ];
