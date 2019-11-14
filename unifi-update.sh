@@ -1,9 +1,21 @@
 #!/bin/bash
+
+## Hey, you... the person reading this code... Don't use this yet. I'm still very much building in safety measures and feature updates. 
+## One day in the hopefully near future I'll have it to a beta status but for now I'm just pushing every update to Master.
+## You've been warned!
+
 clear
+
+# System Variables
+DATE=$(date)
+DOW=$(date +%u)
+WEEK=$(date +%V)
+MONTH=$(date +"%m")
+YEAR=$(date +"%y")
 
 # Misc Variables
 BACKUP_DIR=/opt/UniFi/data
-BACKUP_FILE=/root/backup.tar.gz
+BACKUP_FILE=/root/backup$YEAR$MONTH$DOW.tar.gz
 
 # PKG_VER=5.10.25
 PKG_VER=5.11.39
@@ -103,7 +115,7 @@ if [ -f "$TMP_DIR/Unifi.unix.zip" ];
 
 fi
 
-echo ["Fetching] $PKG_URL"
+echo "[Fetching] $PKG_URL"
 #wget https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip
 wget $PKG_URL
 
