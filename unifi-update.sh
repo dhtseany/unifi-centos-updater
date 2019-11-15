@@ -55,7 +55,7 @@ fi
 if [ -d $TmpDir ];
 	then
 		echo "[Info] $TmpDir does not exist. Creating."
-		mkdir $TmpDir
+		mkdir -p $TmpDir
 	else
 		echo "[Info] $TmpDir already exists."
 fi
@@ -63,6 +63,7 @@ fi
 if [ -d $BackupDir ];
 	then
 		echo "[Info] $BackupDir does not exist. Creating."
+		mkdir -p $BackupDir
 	else
 		echo "[Info] $BackupDir already exists."
 fi
@@ -79,12 +80,12 @@ if [ -e $BackupFile ];
                 rm $BackupFile
             else
                 clear
-                echo "User to chose to keep old backup."
+                echo "[Info] User to chose to keep old backup."
                 mv $BackupFile $BackupFile.bak
         fi
 
     else
-        echo "No backup files found. Proceeding."
+        echo "[Info] No backup files found. Proceeding."
 fi
 
 # Stopping Services
