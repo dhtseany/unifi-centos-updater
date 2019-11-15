@@ -12,7 +12,7 @@ DOW=$(date +%u)
 WEEK=$(date +%V)
 MONTH=$(date +"%m")
 YEAR=$(date +"%y")
-PKG_URL="https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip"
+runCommand=$1
 
 # Misc Variables
 UnifiDataDir=/opt/UniFi/data
@@ -23,8 +23,7 @@ TmpDir=/tmp/unifi-updater
 # PKG_VER=5.10.25
 # PKG_VER=5.11.39
 PKG_VER=5.12.22
-
-runCommand=$1
+PKG_URL="https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip"
 
 if [[ ("$runCommand" == "repair") ]];
 	then
