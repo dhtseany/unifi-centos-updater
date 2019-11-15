@@ -12,6 +12,7 @@ DOW=$(date +%u)
 WEEK=$(date +%V)
 MONTH=$(date +"%m")
 YEAR=$(date +"%y")
+PKG_URL="https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip"
 
 # Misc Variables
 UnifiDataDir=/opt/UniFi/data
