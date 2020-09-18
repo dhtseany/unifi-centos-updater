@@ -266,6 +266,23 @@ if [[ ("$runCommand" == "upgrade") ]];
 		executeTarStart
 		executeExistingInstallerCheck
 		executeUpgrade
+		executeServicesStart
+fi
+
+# Fetch a tar of the existing system
+if [[ ("$runCommand" == "backup") ]];
+	then
+		echo "[NOTICE] Backup was started, saving to $BackupDir/$BackupFile"
+
+		executeServicesStop
+		executeDirSetup
+		
+		cd $TmpDir
+		
+		executeChkBackupFile		
+		executeTarStart
+		executeServicesStart
+		echo "[NOTICE] Backup was successfully saved to $BackupDir/$BackupFile"
 fi
 
 # Dev work reset
