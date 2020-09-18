@@ -185,7 +185,7 @@ executeServicesStart() {
 }
 
 executeServiceAdd () {
-	echo <<EOF > /etc/systemd/system/unifi.service
+	echo <<EOF >> /etc/systemd/system/unifi.service
 # 
 # Systemd unit file for UniFi Controller 
 #
