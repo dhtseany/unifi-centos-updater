@@ -352,6 +352,7 @@ if [[ ("$runCommand" == "remove") ]];
 				userdel ubnt
 				echo "[NOTICE] Removing group ubnt"
 				groupdel ubnt
+		fi
 fi
 
 
