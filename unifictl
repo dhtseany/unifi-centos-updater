@@ -218,6 +218,7 @@ executeServiceRemove() {
 		then
 			echo "[Detected Service] Unifi"
 			rm /etc/systemd/system/unifi.service
+			systemctl daemon-reload
 			echo "[NOTICE] Service Removal Complete."
 		else
 			echo "[NOTICE] No service found."
