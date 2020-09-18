@@ -272,7 +272,7 @@ fi
 # Fetch a tar of the existing system
 if [[ ("$runCommand" == "backup") ]];
 	then
-		echo "[NOTICE] Backup was started, saving to $BackupDir/$BackupFile"
+		echo "[NOTICE] Backup was started, saving to $BackupFile"
 
 		executeServicesStop
 		executeDirSetup
@@ -282,7 +282,7 @@ if [[ ("$runCommand" == "backup") ]];
 		executeChkBackupFile		
 		executeTarStart
 		executeServicesStart
-		echo "[NOTICE] Backup was successfully saved to $BackupDir/$BackupFile"
+		echo "[NOTICE] Backup was successfully saved to $BackupFile"
 fi
 
 # Dev work reset
