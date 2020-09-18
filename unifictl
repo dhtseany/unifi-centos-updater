@@ -207,6 +207,8 @@ WantedBy=multi-user.target
 
 EOF
 
+systemctl daemon-reload
+
 }
 
 executeServiceRemove() {
