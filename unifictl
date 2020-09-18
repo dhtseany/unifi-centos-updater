@@ -88,11 +88,9 @@ executeChkBackupFile() {
 			read -e -p "Shall I remove the existing backup file? [N/y] : " KILL_BACKUP
 
 			if [[ ("$KILL_BACKUP" == "y" || "$KILL_BACKUP" == "Y") ]]; 
-				then
-					clear
+				then					
 					rm $BackupFile
-				else
-					clear
+				else					
 					echo "[Info] User to chose to keep old backup."
 					mv $BackupFile $BackupFile.bak
 			fi
@@ -108,7 +106,6 @@ executeTarStart() {
 
 	if [[ ("$tarStart" == "y" || "$tarStart" == "Y") ]]; 
 		then
-			# clear
 			# take a backup of the data directory
 			echo "[Info] Creating a tar.gz backup of $UnifiDataDir to $BackupFile, please wait..."
 			START_DATE=$(date)
@@ -204,14 +201,16 @@ executeInstall () {
 
 	if [[ ("$installStart" == "y" || "$installStart" == "Y") ]]; 
 		then
+			echo "[Notice] Restored file path would have been: $restoreFile"
+			exit 0
 			# Unzip the download into place
 			echo "[Install] Unzipping UniFi.unix.zip"
 			unzip -qo UniFi.unix.zip -d /opt
 			
-			# # Untar the backup into place
-			# echo "[Install] Restoring $BackupFile to $UnifiDataDir"
-			# # tar xzf $BackupFile -C $UnifiDataDir
-			# tar xzf $BackupFile -C /
+			# Untar the backup into place
+			echo "[Install] Restoring $restoreFile to $UnifiDataDir"
+			# tar xzf $BackupFile -C $UnifiDataDir
+			tar xzf $restoreFile -C /
 			
 			# Take ownership of the unzipped dir
 			echo "[Install] Taking ownership of the updated Unifi directory"
@@ -222,7 +221,6 @@ executeInstall () {
 			exit 1
 	fi
 }
-
 
 
 ##############################
@@ -244,12 +242,13 @@ fi
 # New install
 if [[ ("$runCommand" == "install") ]];
 	then
-
+		restoreFile = $runOption
+		
 		executeServicesStop
 		executeDirSetup
 
 		cd $TmpDir
-
+		
 		executeInstallerFetch
 		executeInstall
 		executeServicesStart
