@@ -347,6 +347,11 @@ if [[ ("$runCommand" == "remove") ]];
 						echo "[Info] $InstallDir exists. Removing."
 						rm -rf $InstallDir
 				fi
+				
+				echo "[NOTICE] Removing user ubnt"
+				userdel ubnt
+				echo "[NOTICE] Removing group ubnt"
+				groupdel ubnt
 fi
 
 
