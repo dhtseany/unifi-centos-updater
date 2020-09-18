@@ -271,6 +271,7 @@ fi
 # Dev work reset
 if [[ ("$runCommand" == "reset") ]];
 	then
+		echo "[NOTICE] Reset has been initiated. Resetting relevant folders."
 		rm -rf /tmp/unifi-updater
 		rm -rf /UnifiBackup
 	fi
