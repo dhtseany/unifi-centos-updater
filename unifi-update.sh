@@ -43,7 +43,10 @@ if [ $runCommand = "install" ]
 	then
 		if [ -z $runOption ]
 			then
-				echo "[ERROR] You have chosen to install to a new system however you have not specified a back to restore from."
+				echo "[ERROR] You have chosen to install to a new system however you have not specified a backup file to restore from."
+				echo "Usage:"
+				echo "$ sudo ./unifi-update.sh install /path/to/backup/file.tar.gz"
+				echo ""
 				echo "If you want to run a new install without restoring an existing config use:"
 				echo "$ sudo ./unifi-update.sh install fresh"
 				exit 1
