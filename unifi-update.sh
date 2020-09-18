@@ -52,7 +52,7 @@ if [ $runCommand = "install" ]
 				exit 1
 		fi
 
-		if [ $runOption = "fresh"]
+		if [ $runOption = "fresh" ]
 			then
 				echo "[ERROR] Fresh installations are not yet supported but will be shortly."
 				exit 1
