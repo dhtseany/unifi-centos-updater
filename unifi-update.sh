@@ -56,6 +56,7 @@ if [ $runCommand = "install" ]
 			then
 				echo "[ERROR] Fresh installations are not yet supported but will be shortly."
 				exit 1
+		fi
 fi
 
 ### Functions Start ###
