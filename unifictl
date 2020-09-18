@@ -17,7 +17,8 @@ runCommand=$1
 runOption=$2
 
 # Misc Variables
-UnifiDataDir=/opt/UniFi/data
+InstallDir=/opt/Unifi
+UnifiDataDir=$InstallDir/data
 BackupDir=/UnifiBackup
 BackupFile=$BackupDir/backup$YEAR$MONTH$DOW.tar.gz
 TmpDir=/tmp/unifi-updater
@@ -36,6 +37,7 @@ if [ -z $runCommand ]
 		echo "install"
 		echo "upgrade"
 		echo "repair (still in developement)"
+		echo "remove (still in development)"
 		exit 1
 fi
 
@@ -252,7 +254,7 @@ if [[ ("$runCommand" == "install") ]];
 		executeDirSetup
 
 		cd $TmpDir
-		
+
 		executeUserAdd
 		executeInstallerFetch
 		executeInstall
@@ -309,6 +311,42 @@ if [[ ("$runCommand" == "reset") ]];
 					echo "[Info] $BackupDir exists. Removing."
 					rm -rf $BackupDir
 			fi		
+fi
+
+# Dev work remove
+if [[ ("$runCommand" == "remove") ]];
+	then
+		echo "[WARNING] I am ready to remove your entire Unifi installation located at $InstallDir"
+		echo "[WARNING] BE ABSOLUTELY SURE YOU WANT TO CONTINUE. YOUR DATA DEPENDS ON IT."
+		echo "[WARNING] This is your last chance to cancel prior to any destructive operations."
+		read -e -p "Shall I continue? [Y/n] : " removeStart
+
+		if [[ ("$removeStart" == "y" || "$removeStart" == "Y") ]]; 
+			then
+				echo "[NOTICE] Uninstall has been initiated. Removing relevant folders."
+				if [ ! -d $TmpDir ];
+					then
+						echo "[Info] $TmpDir does not exist."
+					else
+						echo "[Info] $TmpDir exists. Removing."
+						rm -rf $TmpDir
+				fi
+
+				if [ ! -d $BackupDir ];
+					then
+						echo "[Info] $BackupDir does not exist."
+					else
+						echo "[Info] $BackupDir exists. Removing."
+						rm -rf $BackupDir
+				fi
+				
+				if [ ! -d $InstallDir ];
+					then
+						echo "[Info] $InstallDir does not exist."
+					else
+						echo "[Info] $InstallDir exists. Removing."
+						rm -rf $InstallDir
+				fi
 fi
 
 
