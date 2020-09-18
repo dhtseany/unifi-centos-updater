@@ -242,7 +242,7 @@ fi
 # New install
 if [[ ("$runCommand" == "install") ]];
 	then
-		restoreFile = $runOption
+		restoreFile=$runOption
 
 		executeServicesStop
 		executeDirSetup
@@ -267,6 +267,14 @@ if [[ ("$runCommand" == "upgrade") ]];
 		executeExistingInstallerCheck
 		executeUpgrade
 fi
+
+# Dev work reset
+if [[ ("$runCommand" == "reset") ]];
+	then
+		rm -rf /tmp/unifi-updater
+		rm -rf /UnifiBackup
+	fi
+
 
 ##############################
 ### End of the actual work ###
