@@ -157,8 +157,15 @@ executeInstallerFetch () {
 
 executeServicesStop() {
 	# Stopping Services
-	echo "[Stopping Service] Unifi"
-	systemctl stop unifi
+	echo "[NOTICE] Checking for Unifi service"
+	if [ -f /etc/systemd/system/unifi.service ];
+		then
+			echo "[Detected Service] Unifi"
+			echo "[Stopping Service] Unifi"
+			systemctl stop unifi
+		else
+			echo "[NOTICE] Unifi service not found"
+	fi
 	echo "[Stopping Service] mongod"
 	systemctl stop mongod
 }
@@ -189,7 +196,7 @@ EOF
 }
 
 executeServiceRemove() {
-	# Stopping Services
+	# Check and remove unifi Service
 	echo "[NOTICE] Checking for Unifi service"
 	if [ -f /etc/systemd/system/unifi.service ];
 		then
