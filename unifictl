@@ -221,6 +221,11 @@ executeInstall () {
 	fi
 }
 
+executeUserAdd () {
+	echo "[NOTICE] Creating system user account ubnt"
+	groupadd ubnt
+	useradd -r -g ubnt ubnt
+}
 
 ##############################
 ## Start of the actual work ##
@@ -247,7 +252,8 @@ if [[ ("$runCommand" == "install") ]];
 		executeDirSetup
 
 		cd $TmpDir
-
+		
+		executeUserAdd
 		executeInstallerFetch
 		executeInstall
 		executeServicesStart
