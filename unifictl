@@ -284,20 +284,34 @@ executeUserAdd () {
 	useradd -r -g ubnt ubnt
 }
 
+executedbprune () {
+	cd $TmpDir
+	echo "[NOTICE] Pruning MongoDB Database"
+	wget https://help.ui.com/hc/article_attachments/115024095828/mongo_prune_js.js
+	mongo --port 27117 < mongo_prune_js.js
+	rm mongo_prune_js.js
+}
+
 ##############################
 ## Start of the actual work ##
 ##############################
 
-if [[ ("$runCommand" == "repair") ]];
+# System Maint
+if [[ ("$runCommand" == "maintain") ]];
 	then
 		systemctl stop unifi
-		systemctl stop mongod
+		executedbprune
+		systemctl start unifi
+fi
+
+if [[ ("$runCommand" == "repair") ]];
+	then
+		executeServicesStop
 		#/usr/bin/mongod --dbpath /opt/UniFi/data/db --port 27117 --unixSocketPrefix /opt/UniFi/run/ --logappend --logpath /opt/UniFi/logs/mongod.log --nohttpinterface --bind_ip 127.0.0.1
 		mongod --dbpath=/opt/UniFi/data/db --smallfiles --logpath /opt/UniFi/logs/server.log --repair
 		#chown -R ubnt:ubnt /opt/Unifi/data
 		chown -R ubnt:ubnt /opt/UniFi/data/
-		systemctl start mongod
-		systemctl start unifi
+		executeServicesStart
 fi
 
 # New install
