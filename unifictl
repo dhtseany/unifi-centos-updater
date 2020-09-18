@@ -310,6 +310,7 @@ if [[ ("$runCommand" == "install") ]];
 		executeUserAdd
 		executeInstallerFetch
 		executeInstall
+		executeServiceAdd
 		executeServicesStart
 fi
 
@@ -409,12 +410,21 @@ if [[ ("$runCommand" == "remove") ]];
 		fi
 fi
 
-# Dev work remove
+# Dev work removeservice
 if [[ ("$runCommand" == "removeservice") ]];
 	then
 		executeServicesStop
 		executeServiceRemove
 fi
+
+# Dev work removeservice
+if [[ ("$runCommand" == "addservice") ]];
+	then
+		executeServicesStop
+		executeServiceAdd
+		executeServicesStart
+fi
+
 
 ##############################
 ### End of the actual work ###
