@@ -28,11 +28,27 @@ PKG_VER=5.12.22
 
 PKG_URL="https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip"
 
-if [ -z $runCommand]
+# Command input checks
+if [ -z $runCommand ]
 	then
 		echo "[ERROR] You must specific a run option to proceed."
+		echo "Currently supported run options:"
+		echo "install"
+		echo "upgrade"
+		echo "repair (still in developement)"
 		exit 1
 fi
+
+if [ $runCommand = "install" ]
+	then
+		if [ -z $runOption ]
+			then
+				echo "[ERROR] You have chosen to install to a new system however you have not specified a back to restore from."
+				echo "If you want to run a new install without restoring an existing config use:"
+				echo "$ sudo ./unifi-update.sh install fresh"
+		fi
+fi
+
 
 ### Functions Start ###
 executeDirSetup() {
