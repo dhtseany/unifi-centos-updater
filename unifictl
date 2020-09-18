@@ -170,6 +170,20 @@ executeServicesStop() {
 	systemctl stop mongod
 }
 
+executeServicesStart() {
+	# Stopping Services
+	echo "[NOTICE] Checking for Unifi service"
+	if [ -f /etc/systemd/system/unifi.service ];
+		then
+			echo "[Detected Service] Unifi"
+			systemctl start unifi
+		else
+			echo "[NOTICE] Unifi service not found"
+	fi
+	echo "[Detected Service] mongod"
+	systemctl start mongod
+}
+
 executeServiceAdd () {
 	echo <<EOF > /etc/systemd/system/unifi.service
 # 
