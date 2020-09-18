@@ -163,12 +163,42 @@ executeServicesStop() {
 	systemctl stop mongod
 }
 
-executeServicesStart () {
-	# Starting Services
-	echo "[Starting Service] unifi"
-	systemctl start unifi
-	echo "[Starting Service] mongod"
-	systemctl stop mongod
+executeServiceAdd () {
+	echo <<EOF > /etc/systemd/system/unifi.service
+# 
+# Systemd unit file for UniFi Controller 
+#
+
+[Unit] 
+Description=UniFi AP Web Controller 
+After=syslog.target network.target
+
+[Service] 
+Type=simple 
+User=ubnt 
+WorkingDirectory=/opt/UniFi 
+ExecStart=/usr/bin/java -Xmx4096M -jar /opt/UniFi/lib/ace.jar start 
+ExecStop=/usr/bin/java -jar /opt/UniFi/lib/ace.jar stop 
+SuccessExitStatus=143
+
+[Install] 
+WantedBy=multi-user.target
+
+EOF
+
+}
+
+executeServiceRemove() {
+	# Stopping Services
+	echo "[NOTICE] Checking for Unifi service"
+	if [ -f /etc/systemd/system/unifi.service ];
+		then
+			echo "[Detected Service] Unifi"
+			rm /etc/systemd/system/unifi.service
+			echo "[NOTICE] Service Removal Complete."
+		else
+			echo "[NOTICE] No service found."
+fi
 }
 
 executeUpgrade () {
@@ -324,6 +354,7 @@ if [[ ("$runCommand" == "remove") ]];
 
 		if [[ ("$removeStart" == "y" || "$removeStart" == "Y") ]]; 
 			then
+				executeServicesStop
 				echo "[NOTICE] Uninstall has been initiated. Removing relevant folders."
 				if [ ! -d $TmpDir ];
 					then
@@ -356,6 +387,12 @@ if [[ ("$runCommand" == "remove") ]];
 		fi
 fi
 
+# Dev work remove
+if [[ ("$runCommand" == "removeservice") ]];
+	then
+		executeServicesStop
+		executeServiceRemove
+fi
 
 ##############################
 ### End of the actual work ###
