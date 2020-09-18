@@ -272,9 +272,22 @@ fi
 if [[ ("$runCommand" == "reset") ]];
 	then
 		echo "[NOTICE] Reset has been initiated. Resetting relevant folders."
-		rm -rf /tmp/unifi-updater
-		rm -rf /UnifiBackup
-	fi
+			if [ ! -d $TmpDir ];
+				then
+					echo "[Info] $TmpDir does not exist."
+				else
+					echo "[Info] $TmpDir exists. Removing."
+					rm -rf $TmpDir
+			fi
+
+			if [ ! -d $BackupDir ];
+				then
+					echo "[Info] $BackupDir does not exist."
+				else
+					echo "[Info] $BackupDir exists. Removing."
+					rm -rf $BackupDir
+			fi		
+fi
 
 
 ##############################
