@@ -201,8 +201,7 @@ executeInstall () {
 
 	if [[ ("$installStart" == "y" || "$installStart" == "Y") ]]; 
 		then
-			echo "[Notice] Restored file path would have been: $restoreFile"
-			exit 0
+			echo "[Notice] Restored file path: $restoreFile"
 			# Unzip the download into place
 			echo "[Install] Unzipping UniFi.unix.zip"
 			unzip -qo UniFi.unix.zip -d /opt
