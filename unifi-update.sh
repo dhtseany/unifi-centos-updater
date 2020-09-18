@@ -6,6 +6,7 @@
 
 clear
 
+
 # System Variables
 DATE=$(date)
 DOW=$(date +%u)
@@ -13,6 +14,7 @@ WEEK=$(date +%V)
 MONTH=$(date +"%m")
 YEAR=$(date +"%y")
 runCommand=$1
+runOption=$2
 
 # Misc Variables
 UnifiDataDir=/opt/UniFi/data
@@ -23,7 +25,184 @@ TmpDir=/tmp/unifi-updater
 # PKG_VER=5.10.25
 # PKG_VER=5.11.39
 PKG_VER=5.12.22
+
 PKG_URL="https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip"
+
+if [ -z $runCommand]
+	then
+		echo "[ERROR] You must specific a run option to proceed."
+		exit 1
+fi
+
+### Functions Start ###
+executeDirSetup() {
+	# Create TmpDir
+	#mkdir -p /tmp/unifi-updater
+	if [ ! -d $TmpDir ];
+		then
+			echo "[Info] $TmpDir does not exist. Creating."
+			mkdir -p $TmpDir
+		else
+			echo "[Info] $TmpDir already exists."
+	fi
+
+	if [ ! -d $BackupDir ];
+		then
+			echo "[Info] $BackupDir does not exist. Creating."
+			mkdir -p $BackupDir
+		else
+			echo "[Info] $BackupDir already exists."
+	fi
+}
+
+# Check if existing backup file exists
+executeChkBackupFile() {
+	if [ -e $BackupFile ]; 
+		then
+			echo "You have chosen to launch the installer but I've detected an existing backup."
+			read -e -p "Shall I remove the existing backup file? [N/y] : " KILL_BACKUP
+
+			if [[ ("$KILL_BACKUP" == "y" || "$KILL_BACKUP" == "Y") ]]; 
+				then
+					clear
+					rm $BackupFile
+				else
+					clear
+					echo "[Info] User to chose to keep old backup."
+					mv $BackupFile $BackupFile.bak
+			fi
+
+		else
+			echo "[Info] No backup files found. Proceeding."
+	fi
+}
+
+executeTarStart() {
+	echo "I am ready to begin the backup of $UnifiDataDir"
+	read -e -p "Shall I continue? [Y/n] : " tarStart
+
+	if [[ ("$tarStart" == "y" || "$tarStart" == "Y") ]]; 
+		then
+			# clear
+			# take a backup of the data directory
+			echo "[Info] Creating a tar.gz backup of $UnifiDataDir to $BackupFile, please wait..."
+			START_DATE=$(date)
+			echo "[Info] Started tar backup at: $START_DATE"
+			tar zcf $BackupFile $UnifiDataDir
+			END_DATE=$(date)
+			echo "[Info] Ended tar backup at: $END_DATE"
+		else
+			echo "[FAIL] User to chose halt the process."
+			echo "[FAIL] No data has been altered."
+			exit 1
+	fi
+}
+
+executeExistingInstallerCheck () {
+	if [ -f "$TmpDir/Unifi.unix.zip" ];
+		then
+			echo "[Notice] $TmpDir/Unifi.unix.zip already exists. Removing."
+			rm $TmpDir/Unifi.unix.zip
+			read -e -p "Is that file actually gone? " readFileGone
+			if [ "$readFileGone" = "y" ]; 
+						then
+					echo "[great!]"
+				else
+					echo "[FAIL] User said the task failed. Exiting."
+					exit 1
+			fi
+		else
+					echo "[No] $TmpDir/Unifi.unix.zip"
+					read -e -p "Is that file actually gone? " readFileGone
+					if [ "$readFileGone" = "y" ];
+							then
+									echo "[great!]"
+							else
+									echo "[FAIL] User said the task failed. Exiting."
+									exit 1
+					fi
+	fi
+}
+
+executeInstallerFetch () {
+	echo "[Fetching] $PKG_URL"
+	#wget https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip
+	wget $PKG_URL
+}
+
+executeServicesStop() {
+	# Stopping Services
+	echo "[Stopping Service] Unifi"
+	systemctl stop unifi
+	echo "[Stopping Service] mongod"
+	systemctl stop mongod
+}
+
+executeServicesStart () {
+	# Starting Services
+	echo "[Starting Service] unifi"
+	systemctl start unifi
+	echo "[Starting Service] mongod"
+	systemctl stop mongod
+}
+
+executeUpgrade () {
+	echo "[Notice] I am ready to begin the upgrade of $UnifiDataDir"
+	echo "[Notice] This is your last chance to cancel prior to any destructive operations."
+	read -e -p "Shall I continue? [Y/n] : " upgradeStart
+
+	if [[ ("$upgradeStart" == "y" || "$upgradeStart" == "Y") ]]; 
+		then
+			# Unzip the download into place
+			echo "Unzipping UniFi.unix.zip"
+			unzip -qo UniFi.unix.zip -d /opt
+			
+			# Untar the backup into place
+			echo "Restoring $BackupFile to $UnifiDataDir"
+			# tar xzf $BackupFile -C $UnifiDataDir
+			tar xzf $BackupFile -C /
+			
+			# Take ownership of the unzipped dir
+			echo "Taking ownership of the updated Unifi directory"
+			chown -R ubnt:ubnt /opt/UniFi
+		else
+			echo "[FAIL] User to chose halt the process."
+			echo "[FAIL] No data has been altered."
+			exit 1
+	fi
+}
+
+executeInstall () {
+	echo "[Notice] I am ready to begin a fresh installation of Unifi $PKG_VER"
+	echo "[Notice] This is your last chance to cancel prior to any destructive operations."
+	read -e -p "Shall I continue? [Y/n] : " installStart
+
+	if [[ ("$installStart" == "y" || "$installStart" == "Y") ]]; 
+		then
+			# Unzip the download into place
+			echo "[Install] Unzipping UniFi.unix.zip"
+			unzip -qo UniFi.unix.zip -d /opt
+			
+			# # Untar the backup into place
+			# echo "[Install] Restoring $BackupFile to $UnifiDataDir"
+			# # tar xzf $BackupFile -C $UnifiDataDir
+			# tar xzf $BackupFile -C /
+			
+			# Take ownership of the unzipped dir
+			echo "[Install] Taking ownership of the updated Unifi directory"
+			chown -R ubnt:ubnt /opt/UniFi
+		else
+			echo "[FAIL] User to chose halt the process."
+			echo "[FAIL] No data has been altered."
+			exit 1
+	fi
+}
+
+
+
+##############################
+## Start of the actual work ##
+##############################
 
 if [[ ("$runCommand" == "repair") ]];
 	then
@@ -37,142 +216,38 @@ if [[ ("$runCommand" == "repair") ]];
 		systemctl start unifi
 fi
 
-#manualURL=$1
-#if [ -z $manualURL ];
-#	then
-#		PKG_URL="https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip"
-#		echo "[PKG_URL] $PKG_URL"
-#		# exit 0
-#	else
-#		PKG_URL="manualURL"
-#		echo "[PKG_URL] $PKG_URL"
-#		# exit 0
-#fi
-
-
-# Create TmpDir
-#mkdir -p /tmp/unifi-updater
-if [ ! -d $TmpDir ];
+# New install
+if [[ ("$runCommand" == "install") ]];
 	then
-		echo "[Info] $TmpDir does not exist. Creating."
-		mkdir -p $TmpDir
-	else
-		echo "[Info] $TmpDir already exists."
+
+		executeServicesStop
+		executeDirSetup
+
+		cd $TmpDir
+
+		executeInstallerFetch
+		executeInstall
+		executeServicesStart
 fi
 
-if [ ! -d $BackupDir ];
+# Upgrade existing system
+if [[ ("$runCommand" == "upgrade") ]];
 	then
-		echo "[Info] $BackupDir does not exist. Creating."
-		mkdir -p $BackupDir
-	else
-		echo "[Info] $BackupDir already exists."
-fi
-
-# Check if existing backup file exists
-if [ -e $BackupFile ]; 
-    then
-        echo "You have chosen to launch the installer but I've detected an existing backup."
-        read -e -p "Shall I remove the existing backup file? [N/y] : " KILL_BACKUP
-
-        if [[ ("$KILL_BACKUP" == "y" || "$KILL_BACKUP" == "Y") ]]; 
-            then
-                clear
-                rm $BackupFile
-            else
-                clear
-                echo "[Info] User to chose to keep old backup."
-                mv $BackupFile $BackupFile.bak
-        fi
-
-    else
-        echo "[Info] No backup files found. Proceeding."
-fi
-
-# Stopping Services
-echo "[Stopping Service] Unifi"
-systemctl stop unifi
-echo "[Stopping Service] mongod"
-systemctl stop mongod
-
-echo "I am ready to begin the backup of $UnifiDataDir"
-read -e -p "Shall I continue? [Y/n] : " tarStart
-
-if [[ ("$tarStart" == "y" || "$tarStart" == "Y") ]]; 
-	then
-		# clear
-		# take a backup of the data directory
-		echo "[Info] Creating a tar.gz backup of $UnifiDataDir to $BackupFile, please wait..."
-		START_DATE=$(date)
-		echo "[Info] Started tar backup at: $START_DATE"
-		tar zcf $BackupFile $UnifiDataDir
-		END_DATE=$(date)
-		echo "[Info] Ended tar backup at: $END_DATE"
-	else
-		echo "[FAIL] User to chose halt the process."
-		echo "[FAIL] No data has been altered."
-		exit 1
-fi
-
-# cd to TmpDir and fetch latest installer
-cd $TmpDir
-
-if [ -f "$TmpDir/Unifi.unix.zip" ];
-	then
-		echo "[Notice] $TmpDir/Unifi.unix.zip already exists. Removing."
-		rm $TmpDir/Unifi.unix.zip
-		read -e -p "Is that file actually gone? " readFileGone
-		if [ "$readFileGone" = "y" ]; 
-	                then
-				echo "[great!]"
-			else
-				echo "[FAIL] User said the task failed. Exiting."
-				exit 1
-		fi
-	else
-            	echo "[No] $TmpDir/Unifi.unix.zip"
-                read -e -p "Is that file actually gone? " readFileGone
-                if [ "$readFileGone" = "y" ];
-                        then
-                            	echo "[great!]"
-                        else
-                            	echo "[FAIL] User said the task failed. Exiting."
-                                exit 1
-                fi
-fi
-
-echo "[Fetching] $PKG_URL"
-#wget https://dl.ubnt.com/unifi/${PKG_VER}/UniFi.unix.zip
-wget $PKG_URL
-
-echo "[Notice] I am ready to begin the upgrade of $UnifiDataDir"
-echo "[Notice] This is your last chance to cancel prior to any destructive operations."
-read -e -p "Shall I continue? [Y/n] : " upgradeStart
-
-if [[ ("$upgradeStart" == "y" || "$upgradeStart" == "Y") ]]; 
-	then
-		# Unzip the download into place
-		echo "Unzipping UniFi.unix.zip"
-		unzip -qo UniFi.unix.zip -d /opt
+		executeServicesStop
+		executeDirSetup
 		
-		# Untar the backup into place
-		echo "Restoring $BackupFile to $UnifiDataDir"
-		# tar xzf $BackupFile -C $UnifiDataDir
-		tar xzf $BackupFile -C /
+		cd $TmpDir
 		
-		# Take ownership of the unzipped dir
-		echo "Taking ownership of the updated Unifi directory"
-		chown -R ubnt:ubnt /opt/UniFi
-	else
-		echo "[FAIL] User to chose halt the process."
-		echo "[FAIL] No data has been altered."
-		exit 1
+		executeChkBackupFile		
+		executeTarStart
+		executeExistingInstallerCheck
+		executeUpgrade
 fi
 
-# Starting Services
-echo "[Starting Service] unifi"
-systemctl start unifi
-echo "[Starting Service] mongod"
-systemctl stop mongod
+##############################
+### End of the actual work ###
+##############################
+
 
 # Complete
 echo "Process is completed."
