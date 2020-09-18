@@ -243,12 +243,12 @@ fi
 if [[ ("$runCommand" == "install") ]];
 	then
 		restoreFile = $runOption
-		
+
 		executeServicesStop
 		executeDirSetup
 
 		cd $TmpDir
-		
+
 		executeInstallerFetch
 		executeInstall
 		executeServicesStart
