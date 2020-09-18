@@ -421,6 +421,7 @@ fi
 if [[ ("$runCommand" == "addservice") ]];
 	then
 		executeServicesStop
+		executeServiceRemove
 		executeServiceAdd
 		executeServicesStart
 fi
