@@ -355,6 +355,7 @@ if [[ ("$runCommand" == "remove") ]];
 		if [[ ("$removeStart" == "y" || "$removeStart" == "Y") ]]; 
 			then
 				executeServicesStop
+				executeServiceRemove
 				echo "[NOTICE] Uninstall has been initiated. Removing relevant folders."
 				if [ ! -d $TmpDir ];
 					then
