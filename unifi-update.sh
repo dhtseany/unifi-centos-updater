@@ -51,6 +51,11 @@ if [ $runCommand = "install" ]
 				echo "$ sudo ./unifi-update.sh install fresh"
 				exit 1
 		fi
+
+		if [ $runOption = "fresh"]
+			then
+				echo "[ERROR] Fresh installations are not yet supported but will be shortly."
+				exit 1
 fi
 
 ### Functions Start ###
